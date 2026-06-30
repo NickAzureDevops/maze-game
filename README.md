@@ -9,6 +9,14 @@ This repository is the **Game Agent** side of a broader **GitHub Copilot Apps** 
 - **In this repo** — context-aware code reasoning, safe event instrumentation, and gameplay-preserving changes
 - **In the broader system** — backend services, multi-repo orchestration, full-stack generation, and end-to-end event flow with [NickAzureDevops/pac-man-services](https://github.com/NickAzureDevops/pac-man-services)
 
+Together, `pac-man-game` and [NickAzureDevops/pac-man-services](https://github.com/NickAzureDevops/pac-man-services) demonstrate:
+
+- **Context-aware reasoning** — Copilot understands existing code in both repos and makes targeted changes.
+- **Planning and approval workflow** — Plans can be generated, reviewed, and then executed across repos.
+- **Multi-repository orchestration** — Copilot coordinates changes in the producer and consumer repos together.
+- **Full-stack generation** — The demo spans frontend gameplay, backend services, and dashboard behavior.
+- **Event-driven architecture understanding** — Copilot models the flow from game events to service ingestion to UI updates.
+
 ## Controls
 
 | Key | Action |
