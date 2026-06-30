@@ -48,7 +48,7 @@ const TEMPLATE = [
 
 // ─── State ───────────────────────────────────────────────────────────────────
 let maze, score, lives, level, gameState
-let pac, ghosts, powerTimer, achievementsHit, frame
+let pac, ghosts, powerTimer, achievementsHit, frame, dotCount
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const wrap   = col => ((col % COLS) + COLS) % COLS
@@ -68,6 +68,7 @@ function initGame() {
   score = 0; lives = 3; level = 1; frame = 0; powerTimer = 0
   achievementsHit = new Set()
   gameState = 'idle'
+  dotCount = maze.flat().filter(c => c === 0 || c === 2).length
   spawnPac(); spawnGhosts(); updateHUD()
   showOverlay('\u{1F47B} Pac-Man', 'Press <strong>Enter</strong> or <strong>Space</strong> to start')
 }
@@ -145,14 +146,14 @@ function update() {
 
       const cell = maze[pac.row]?.[pac.col]
       if (cell === 0) {
-        maze[pac.row][pac.col] = 3; addScore(10)
+        maze[pac.row][pac.col] = 3; dotCount--; addScore(10)
       } else if (cell === 2) {
-        maze[pac.row][pac.col] = 3; addScore(50)
+        maze[pac.row][pac.col] = 3; dotCount--; addScore(50)
         powerTimer = POWER_FRAMES
         ghosts.forEach(g => { g.frightened = true })
       }
 
-      if (!maze.flat().some(c => c === 0 || c === 2)) nextLevel()
+      if (dotCount === 0) nextLevel()
     }
   }
 
@@ -202,6 +203,7 @@ function onDied() {
 
 function nextLevel() {
   level++; maze = TEMPLATE.map(r => [...r])
+  dotCount = maze.flat().filter(c => c === 0 || c === 2).length
   spawnPac(); spawnGhosts(); powerTimer = 0; updateHUD()
   emitEvent('achievementCandidate', { score, achievement: `Level ${level} reached!`, level })
 }
