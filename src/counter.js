@@ -1,4 +1,4 @@
-function emitEvent(type, payload) {
+export function emitEvent(type, payload) {
   fetch('http://localhost:3001/event', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
