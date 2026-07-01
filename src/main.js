@@ -70,7 +70,7 @@ function initGame() {
   gameState = 'idle'
   dotCount = maze.flat().filter(c => c === 0 || c === 2).length
   spawnPac(); spawnGhosts(); updateHUD()
-  showOverlay('\u{1F47B} Pac-Man', 'Press <strong>Enter</strong> or <strong>Space</strong> to start')
+  showOverlay('\u{1F9E9} Maze Game', 'Press <strong>Enter</strong> or <strong>Space</strong> to start')
 }
 
 function spawnPac() {
@@ -135,7 +135,7 @@ function update() {
   // Power timer
   if (powerTimer > 0 && --powerTimer === 0) ghosts.forEach(g => { g.frightened = false })
 
-  // Move Pac-Man
+  // Move player
   if (frame % PAC_SPEED === 0) {
     const nc = wrap(pac.col + pac.nextDx), nr = pac.row + pac.nextDy
     if (!isWall(nc, nr)) { pac.dx = pac.nextDx; pac.dy = pac.nextDy }
@@ -252,7 +252,7 @@ function draw() {
     }
   }
 
-  // Pac-Man
+  // Player
   const px = pac.col * T + T/2, py = pac.row * T + T/2
   const rot = pac.dx === -1 ? Math.PI : pac.dy === -1 ? -Math.PI/2 : pac.dy === 1 ? Math.PI/2 : 0
   ctx.fillStyle = '#FFD700'

@@ -1,7 +1,7 @@
 {
-  "name": "pac-man-game",
+  "name": "maze-game",
   "version": "1.0.0",
-  "description": "Pac-Man game with purple neon theme built with Vite",
+  "description": "Maze game with modern dashboard theme built with Vite",
   "private": true,
   "type": "module",
   "scripts": {

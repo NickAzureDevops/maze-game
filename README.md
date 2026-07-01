@@ -1,15 +1,15 @@
-# 👻 Pac-Man Game
+# 🧩 Maze Game
 
-A browser-based Pac-Man game with a modern dashboard shell, built with vanilla JavaScript and [Vite](https://vite.dev/).
+A browser-based maze game with a modern dashboard shell, built with vanilla JavaScript and [Vite](https://vite.dev/).
 
-![Pac-Man dashboard preview](./public/pacman-dashboard.png)
+![Maze Game dashboard preview](./public/maze-game-dashboard.png)
 
-This repository is the **Game Agent** side of a broader **GitHub Copilot Apps** demo. It keeps Pac-Man playable while acting as the event producer for the wider system.
+This repository is the **Game Agent** side of a broader **GitHub Copilot Apps** demo. It keeps Maze Game playable while acting as the event producer for the wider system.
 
 - **In this repo** — context-aware code reasoning, safe event instrumentation, and gameplay-preserving changes
 - **In the broader system** — backend services, multi-repo orchestration, full-stack generation, and end-to-end event flow with [NickAzureDevops/pac-man-services](https://github.com/NickAzureDevops/pac-man-services)
 
-Together, `pac-man-game` and [NickAzureDevops/pac-man-services](https://github.com/NickAzureDevops/pac-man-services) demonstrate:
+Together, this Maze Game repo and [NickAzureDevops/pac-man-services](https://github.com/NickAzureDevops/pac-man-services) demonstrate:
 
 - **Context-aware reasoning** — Copilot understands existing code in both repos and makes targeted changes.
 - **Planning and approval workflow** — Plans can be generated, reviewed, and then executed across repos.
@@ -21,7 +21,7 @@ Together, `pac-man-game` and [NickAzureDevops/pac-man-services](https://github.c
 
 | Key | Action |
 |-----|--------|
-| `Arrow Keys` / `WASD` | Move Pac-Man |
+| `Arrow Keys` / `WASD` | Move player |
 | `Enter` / `Space` | Start / resume game |
 
 ## Getting Started
