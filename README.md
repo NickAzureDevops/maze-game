@@ -46,6 +46,14 @@ Typical payloads emitted by this repo:
 - `scoreUpdated`: `{ "score": 100, "delta": 10, "level": 1 }`
 - `achievementCandidate`: `{ "score": 500, "achievement": "Reached 500 points!", "level": 1 }`
 
+## Agent Skill
+
+This repo includes a reusable prompt skill:
+
+- `.github/prompts/event-schema-validation.prompt.md`
+
+Use it to validate producer-side contract compliance before demos or merges.
+
 ## Controls
 
 | Key | Action |

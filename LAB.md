@@ -248,6 +248,9 @@ In the Game Agent session, type:
 
 > "Use the event schema validation skill to check that every emitEvent call in src/main.js uses only scoreUpdated or achievementCandidate, and that the payload shape matches the contract."
 
+Skill file in this repo:
+- `.github/prompts/event-schema-validation.prompt.md`
+
 **What to point out:**
 - The agent doesn't re-read the codebase from scratch — it calls the skill
 - The skill returns a structured pass/fail result with specific line references
