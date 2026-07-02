@@ -1,7 +1,20 @@
 # 🧩 GitHub Copilot Apps — Demo Lab
 
 > **Total time: 20–30 minutes**
-> **Goal:** Show how GitHub Copilot Apps evolves a legacy game into a multi-repo, event-driven system using Plan Mode, Agent Mode, MCP, Workflow Automation, multi-repo tasks, and Canvas.
+> **Goal:** Show how GitHub Copilot Apps evolves a legacy game into a multi-repo, event-driven system using Canvas, Plan Mode, Agent Mode, MCP, Multi-repo tasks, and Agent Skills.
+
+## ⏱️ Timing Guide
+
+| Segment | Feature | Time |
+| --- | --- | --- |
+| 0:00 | Setup + narrative framing | 2 min |
+| 2:00 | **Canvas** | 3 min |
+| 5:00 | **Plan Mode** | 4 min |
+| 9:00 | **Agent Mode / Agent Merge** | 5 min |
+| 14:00 | **MCP** | 4 min |
+| 18:00 | **Multi-repo task** | 5 min |
+| 23:00 | **Agent Skills** | 4 min |
+| 27:00 | Close + live demo | 3 min |
 
 
 ## 🏗️ System Overview
@@ -218,31 +231,44 @@ Play the game. Open `http://localhost:3001`. Show events appearing in the dashbo
 
 ---
 
-## ⚙️ 6. Workflow Automation (4 min)
+## ⚙️ 6. Agent Skills (4 min)
 
-> **What you're showing:** Repeatable, scheduled, or trigger-based automation — the full pipeline as a workflow.
+> **What you're showing:** Skills are reusable, packaged capabilities you give an agent — turning one-off reasoning into shared team knowledge.
 
-### What to do
+### What a skill is (30 sec — say this)
 
-In Copilot Apps, open **Workflows** and show (or create) a workflow with this prompt:
+> "An agent on its own can reason. A skilled agent can *act* — reliably, repeatedly, across any session. Skills are how you encode what the agent knows into something it can reuse."
 
-> "Every time a new commit is pushed to maze-game: check that all emitEvent calls use only allowed event types (scoreUpdated, achievementCandidate), and that no gameplay constants were modified."
+### Show a skill being invoked live (2 min)
 
-Walk through the workflow config:
+In the Game Agent session, type:
 
-- **Trigger:** push to maze-game
-- **Agent:** Game Agent
-- **Prompt:** schema + safety check
-- **Output:** pass/fail report in the session
+> "Use the event schema validation skill to check that every emitEvent call in src/main.js uses only scoreUpdated or achievementCandidate, and that the payload shape matches the contract."
+
+**What to point out:**
+- The agent doesn't re-read the codebase from scratch — it calls the skill
+- The skill returns a structured pass/fail result with specific line references
+- This is the same check that ran during Agent Mode, now packaged and reusable
+
+### Show skills composing across agents (90 sec)
+
+Switch to the Integration Agent session and type:
+
+> "Run the event schema validation skill against both maze-game and maze-game-services and confirm the contracts match end to end."
+
+**What to point out:**
+- The same skill runs in two different agents against two different repos
+- Neither agent needed to be told how to validate — the skill carries that knowledge
+- This is how you scale: write the reasoning once, share it across the system
 
 ### What to point out
 
-- This runs automatically — no human needs to remember to check
-- The same agent reasoning that worked interactively can be scheduled
-- Workflows turn one-off agent tasks into standing guardrails
+- Skills are not scripts — they're agent-callable capabilities with structured output
+- Any agent with the skill can invoke it — Game Agent, Platform Agent, Integration Agent
+- Skills turn ad-hoc prompts into standing team knowledge
 
 **Key message:**
-> "Workflow Automation means the system keeps watching, not just the developer. Copilot becomes a continuous team member."
+> "Skills are how agents get extended. You don't retrain them — you give them new capabilities. Agents can be extended, composed, and shared across your whole engineering system."
 
 ---
 
@@ -251,7 +277,7 @@ Walk through the workflow config:
 Run the full system one more time. Play the game. Show the dashboard updating live.
 
 **Closing line:**
-> "We started with a legacy game. Copilot Apps understood it in seconds, planned the changes, got human approval through Canvas, used MCP to execute safely, coordinated across two repos, and now runs as an automated workflow. This is what AI-native engineering looks like."
+> "We started with a legacy game. Copilot Apps understood it in seconds, planned the changes, got human approval through Canvas, used MCP to execute safely, coordinated across two repos, and extended the agents with reusable skills. This is what AI-native engineering looks like."
 
 ### Live checklist
 
@@ -273,4 +299,4 @@ Run the full system one more time. Play the game. Show the dashboard updating li
 | **Agent Merge** | Integration Agent combines outputs from both agents into one validation |
 | **MCP** | Every tool call (read, write, run) is visible, declared, and auditable |
 | **Multi-repo task** | One session spans both repos and validates cross-repo compatibility |
-| **Workflow Automation** | Safety checks run automatically on every push — no human needed |
+| **Agent Skills** | Same skill invoked across Game Agent and Integration Agent — reusable, composable capabilities |
