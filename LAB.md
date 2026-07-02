@@ -1,12 +1,28 @@
-# 🧩 GitHub Copilot Apps — Lab Instructions
+# 🧩 GitHub Copilot Apps — Demo Lab
 
-> **Goal:** Use GitHub Copilot Chat, Agents, Canvas, MCP, and automation to evolve a legacy game into a multi-repo, event-driven system — without rebuilding it.
+> **Total time: 20–30 minutes**
+> **Goal:** Show how GitHub Copilot Apps evolves a legacy game into a multi-repo, event-driven system using Plan Mode, Agent Mode, MCP, Workflow Automation, multi-repo tasks, and Canvas.
+
+## ⏱️ Timing Guide
+
+| Segment | Feature | Time |
+| --- | --- | --- |
+| 0:00 | Setup + narrative framing | 2 min |
+| 2:00 | **Plan Mode** | 4 min |
+| 6:00 | **Canvas** | 3 min |
+| 9:00 | **Agent Mode / Agent Merge** | 5 min |
+| 14:00 | **MCP** | 4 min |
+| 18:00 | **Multi-repo task** | 5 min |
+| 23:00 | **Workflow Automation** | 4 min |
+| 27:00 | Close + live demo | 3 min |
 
 ---
 
-## 🏗️ Architecture Overview
+---
 
-```
+## 🏗️ System Overview
+
+```javascript
 ┌──────────────────────────────┐
 │       CANVAS (Runtime)       │
 │   Plan + Agents + Approval   │
@@ -19,247 +35,241 @@
    │                   │
    └──── HTTP POST ────┘
          /event
-              │
               ▼
       live dashboard UI
 ```
 
----
-
-## 📦 Repositories
-
-| Repo | Role | Your job |
-|------|------|----------|
-| **maze-game** (this repo) | Legacy frontend, event producer | Add minimal event emission hooks only |
-| **pac-man-services** | AI-built backend platform, event consumer | Build the API, event store, and dashboard |
+| Repo | Role |
+| --- | --- |
+| **maze-game** (this repo) | Legacy frontend — Game Agent instruments it |
+| **pac-man-services** | AI-built backend — Platform Agent creates it |
 
 ---
 
-## 🤖 Agents
+## 🟡 Setup (2 min)
 
-| Agent | Repo | Responsibility |
-|-------|------|---------------|
-| **Game Agent** | maze-game | Instruments the game with safe event emission |
-| **Platform Agent** | pac-man-services | Creates the Express API, event store, and UI dashboard |
-| **Integration Agent** | Both | Connects event flow and validates schema consistency end-to-end |
+Before starting, have these open and ready:
+
+1. [maze-game](https://github.com/NickAzureDevops/maze-game) open in GitHub Copilot Apps
+2. [pac-man-services](https://github.com/NickAzureDevops/pac-man-services) open in a second tab
+3. Game running locally: `npm run dev` → `http://localhost:5173`
+
+**Opening line:**
+> "This is a legacy game. We're not going to rewrite it. We're going to use Copilot Apps to evolve it into a connected, multi-repo, event-driven system."
+
+Play the game for 10 seconds. Show it works. Then stop.
 
 ---
 
-## 🎮 Lab 1 — maze-game (this repo)
+## 🟣 1. Plan Mode (4 min)
 
-**Owner: Game Agent**
+> **What you're showing:** Copilot reasons about an existing codebase and proposes a structured plan before touching any code.
 
-### Prerequisites
+### What to do
+
+In the Copilot Chat panel in the maze-game session, type:
+
+> "I want to add event emission to this game — post to a local service when the score changes or an achievement milestone is reached. Show me a plan first, don't make any changes yet."
+
+### What Copilot does
+
+- Reads `src/main.js`, `src/counter.js`, and `.github/instructions/`
+- Identifies where score changes happen
+- Proposes a plan listing exactly which files change and what is protected
+
+### What to point out
+
+- Copilot found the score logic without being told where it lives
+- The plan calls out what it will **not** touch (gameplay, rendering, controls)
+- Nothing has been written yet — this is pure reasoning
+
+**Key message:**
+> "Plan Mode separates reasoning from execution. The agent thinks first, you approve, then it acts."
+
+---
+
+## 🟦 2. Canvas (3 min)
+
+> **What you're showing:** Canvas is the visual workspace where plans are displayed, approved, and tracked.
+
+### What to do
+
+After the plan appears, point to the Canvas panel. Walk through:
+
+1. **Plan view** — the proposed steps are listed with file targets and constraints
+2. **Approval gate** — the "Approve" button is visible; nothing runs until you click it
+3. **Execution state** — after approval, each step shows in-progress / done status in real time
+
+### What to point out
+
+- Canvas is not just a chat window — it's an orchestration surface
+- The human stays in control: plan is always reviewed before execution
+- You can edit the plan in Canvas before approving (show the edit icon)
+
+**Key message:**
+> "Canvas is where planning becomes execution — with a human in the loop."
+
+---
+
+## 🤖 3. Agent Mode / Agent Merge (5 min)
+
+> **What you're showing:** Agents are role-scoped workers. Each agent has defined permissions, a target repo, and a job. Agent Merge shows multiple agents contributing to the same outcome.
+
+### What to do
+
+Approve the plan. Watch the **Game Agent** execute:
+
+1. It updates `src/counter.js` with the `emitEvent()` function
+2. It adds `emitEvent('scoreUpdated', ...)` call sites in `src/main.js`
+3. It adds milestone checks for `achievementCandidate`
+
+Then switch to the pac-man-services tab. Trigger the **Platform Agent**:
+
+> "Build the event platform for this game. It needs a POST /event endpoint, a GET /events endpoint, and a live dashboard. Accept only scoreUpdated and achievementCandidate events."
+
+Show both agents working — Game Agent on one repo, Platform Agent on the other.
+
+### Agent Merge
+
+With both agents done, trigger the **Integration Agent**:
+
+> "Verify both repos are compatible — check that the event schema from maze-game matches what pac-man-services accepts."
+
+Point out that the Integration Agent reads from both repos and produces a single validation result. This is **Agent Merge** — multiple agents contributing to one outcome.
+
+### What to point out
+
+- Each agent has a defined role and scope — it can't overstep
+- Game Agent will not touch gameplay constants even if asked
+- Agent Merge coordinates across repo boundaries
+
+**Key message:**
+> "Agents are not generic assistants — they are role-scoped workers with defined boundaries. Agent Merge lets them collaborate."
+
+---
+
+## 🔗 4. MCP (4 min)
+
+> **What you're showing:** MCP (Model Context Protocol) is the tool bridge that lets agents interact with repos, APIs, and runtime state safely.
+
+### What to do
+
+In the Canvas execution view, click into any completed agent step to expand the tool call log. Show:
+
+- `read_file` — agent reading `src/main.js` before modifying it
+- `write_file` — agent writing the updated file
+- `bash` — running `npm run dev` to verify the server starts
+
+Then explain what MCP is:
+
+> "Each of these is an MCP tool call. MCP is the protocol that defines what tools agents can use, what they can read, and what they can write. It's what makes agent actions auditable and safe."
+
+### What to point out
+
+- Every file read and write is visible — no hidden side effects
+- Agents can only use tools that are declared in their MCP config
+- MCP tools include: file read/write, shell commands, HTTP calls, repo search
+
+**Key message:**
+> "MCP is the tool layer between the agent's reasoning and the real world. It keeps agents powerful but auditable."
+
+---
+
+## 🗂️ 5. Multi-repo Task (5 min)
+
+> **What you're showing:** A single Copilot session that spans two repositories and coordinates changes across both.
+
+### What to do
+
+Open a new session with **both repos** available. Type:
+
+> "The maze-game emits events and pac-man-services receives them. Show me the full event flow from the game to the dashboard and confirm the schema matches end to end."
+
+Watch Copilot:
+
+1. Read `src/counter.js` in maze-game — finds the POST shape
+2. Read `src/server.js` in pac-man-services — finds the accepted event types
+3. Compare schemas and confirm they match
+4. Report which events flow and what the dashboard will show
+
+### Then run it live
 
 ```bash
-git clone https://github.com/NickAzureDevops/maze-game
-cd maze-game
-npm ci
-npm run dev       # http://localhost:5173
+
+
+# Terminal 1 — game
+cd maze-game && npm run dev
+
+# Terminal 2 — platform
+cd pac-man-services && node src/server.js
 ```
 
-### What you are allowed to change
+Play the game. Open `http://localhost:3001`. Show events appearing in the dashboard as you score points.
 
-- `src/counter.js` — the `emitEvent()` HTTP bridge
-- `emitEvent()` call sites in `src/main.js` — adding calls only
+### What to point out
 
-### What you must NOT touch
+- One session, two repos — Copilot holds context across both
+- No copy-pasting between tabs to verify compatibility
+- The live demo closes the loop: you can see the event flow happen in real time
 
-- `draw()` — canvas rendering
-- `moveGhost()` — ghost AI
-- `TEMPLATE` array — maze layout
-- `keydown` handler — controls
-- `PAC_SPEED`, `GHOST_SPEED` — timing constants
-- `index.html` — HUD structure
-
-### Step 1 — Implement `emitEvent`
-
-Open `src/counter.js` and implement the fire-and-forget HTTP bridge:
-
-```js
-export function emitEvent(type, payload) {
-  fetch('http://localhost:3001/event', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, timestamp: new Date().toISOString(), payload }),
-  }).catch(() => {}) // never let event errors affect gameplay
-}
-```
-
-> **Rule:** Always swallow errors. The game loop must never be blocked or interrupted by event emission.
-
-### Step 2 — Emit `scoreUpdated`
-
-In `src/main.js`, find where the score increases (dot collection, power pellet) and add:
-
-```js
-emitEvent('scoreUpdated', { score, delta: points, level })
-```
-
-Emit on **every** score change.
-
-### Step 3 — Emit `achievementCandidate`
-
-Milestones: `100, 500, 1000, 2500, 5000` points and each level-up.
-
-```js
-emitEvent('achievementCandidate', {
-  score,
-  achievement: `Reached ${score} points!`,
-  level
-})
-```
-
-Emit **once per milestone** — track which thresholds have already fired.
-
-### Step 4 — Event shape
-
-Every POST to `http://localhost:3001/event` must match:
-
-```json
-{
-  "type": "scoreUpdated",
-  "timestamp": "2026-07-02T21:00:00.000Z",
-  "payload": { "score": 150, "delta": 10, "level": 1 }
-}
-```
-
-> **Never** use `achievementTriggered` — it is rejected by pac-man-services.
-
-### Step 5 — Verify
-
-1. Start pac-man-services: `cd ../pac-man-services && node src/server.js`
-2. Start game: `npm run dev`
-3. Play and earn points
-4. Open `http://localhost:3001` — events should appear within 2 seconds
-5. Check browser console — there must be no CORS errors
+**Key message:**
+> "Multi-repo tasks are where Copilot Apps goes beyond a single-file editor. It reasons about systems, not just files."
 
 ---
 
-## 🌐 Lab 2 — pac-man-services
+## ⚙️ 6. Workflow Automation (4 min)
 
-**Owner: Platform Agent**
+> **What you're showing:** Repeatable, scheduled, or trigger-based automation — the full pipeline as a workflow.
 
-> These instructions belong in the [pac-man-services](https://github.com/NickAzureDevops/pac-man-services) repo.
+### What to do
 
-### Prerequisites
+In Copilot Apps, open **Workflows** and show (or create) a workflow with this prompt:
 
-```bash
-git clone https://github.com/NickAzureDevops/pac-man-services
-cd pac-man-services
-npm ci
-node src/server.js    # http://localhost:3001
-```
+> "Every time a new commit is pushed to maze-game: check that all emitEvent calls use only allowed event types (scoreUpdated, achievementCandidate), and that no gameplay constants were modified."
 
-### What to build
+Walk through the workflow config:
 
-The Platform Agent creates a minimal Node.js + Express platform with:
+- **Trigger:** push to maze-game
+- **Agent:** Game Agent
+- **Prompt:** schema + safety check
+- **Output:** pass/fail report in the session
 
-| Piece | Description |
-|-------|-------------|
-| `POST /event` | Accepts and stores incoming game events |
-| `GET /events` | Returns all stored events as JSON |
-| `GET /` | Simple live dashboard UI |
-| In-memory store | Array of events, reset on restart |
-| CORS | Open (`*`) — the game runs on a different port |
+### What to point out
 
-### Step 1 — Express server + CORS
+- This runs automatically — no human needs to remember to check
+- The same agent reasoning that worked interactively can be scheduled
+- Workflows turn one-off agent tasks into standing guardrails
 
-```js
-const express = require('express')
-const app = express()
-app.use(express.json())
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  next()
-})
-```
-
-### Step 2 — Event store + POST /event
-
-```js
-const events = []
-
-app.post('/event', (req, res) => {
-  const { type, timestamp, payload } = req.body
-  if (!['scoreUpdated', 'achievementCandidate'].includes(type)) {
-    return res.status(400).json({ error: 'Unknown event type' })
-  }
-  events.push({ type, timestamp, payload, receivedAt: new Date().toISOString() })
-  res.status(201).json({ ok: true })
-})
-```
-
-### Step 3 — GET /events
-
-```js
-app.get('/events', (req, res) => res.json(events))
-```
-
-### Step 4 — Dashboard UI (GET /)
-
-Serve an HTML page that polls `GET /events` every 2 seconds and renders a live table of score and achievement events.
-
-### Step 5 — Schema contract
-
-| Event type | Required payload fields |
-|------------|------------------------|
-| `scoreUpdated` | `score`, `delta`, `level` |
-| `achievementCandidate` | `score`, `achievement`, `level` |
-
-Reject any event type not in the allowed list with HTTP 400.
-
-### Step 6 — Verify
-
-1. `node src/server.js`
-2. `curl -X POST http://localhost:3001/event -H "Content-Type: application/json" -d '{"type":"scoreUpdated","timestamp":"2026-07-02T00:00:00Z","payload":{"score":10,"delta":10,"level":1}}'`
-3. `curl http://localhost:3001/events` — should return the event
-4. Open `http://localhost:3001` — dashboard should show the event
+**Key message:**
+> "Workflow Automation means the system keeps watching, not just the developer. Copilot becomes a continuous team member."
 
 ---
 
-## 🔗 Lab 3 — Integration (both repos)
+## 🏁 Close (3 min)
 
-**Owner: Integration Agent**
+Run the full system one more time. Play the game. Show the dashboard updating live.
 
-### End-to-end checklist
+**Closing line:**
+> "We started with a legacy game. Copilot Apps understood it in seconds, planned the changes, got human approval through Canvas, used MCP to execute safely, coordinated across two repos, and now runs as an automated workflow. This is what AI-native engineering looks like."
 
-- [ ] `pac-man-services` is running on port `3001`
-- [ ] `maze-game` is running on port `5173`
-- [ ] Playing the game triggers `scoreUpdated` POSTs visible in `GET /events`
-- [ ] Reaching a milestone threshold triggers `achievementCandidate`
+### Live checklist
+
+- [ ] Game runs at `http://localhost:5173`
+- [ ] Score events appear at `http://localhost:3001` within 2 seconds
+- [ ] Achievement events fire at 100, 500, 1000, 2500, 5000 points
 - [ ] No CORS errors in the browser console
-- [ ] No gameplay disruption — the game loop is unaffected by network failures
-
-### Schema consistency check
-
-Run this against the live service while playing:
-
-```bash
-watch -n 2 'curl -s http://localhost:3001/events | python3 -m json.tool'
-```
-
-Every `scoreUpdated` event must have `score`, `delta`, and `level` in payload.
-Every `achievementCandidate` event must have `score`, `achievement`, and `level`.
+- [ ] No gameplay disruption from event emission
 
 ---
 
-## 📋 What each feature proves
+## 📋 Feature Summary
 
-| Feature | Demo proof |
-|---------|------------|
-| **Copilot Chat** | Natural language code changes in a legacy repo |
-| **Copilot Agents** | Role-based execution across repos |
-| **Canvas** | Plan generation, human approval, then execution |
-| **MCP** | Safe tool bridge — agents read/write repos and call APIs |
-| **Multi-repo orchestration** | Game + services working together live |
-| **Full-stack generation** | API + dashboard + repo scaffolding from a prompt |
-| **Event-driven architecture** | Score events flow into a live UI |
-| **Automation** | End-to-end workflow from a single trigger |
-
----
-
-## 🧭 Demo Narrative (30 seconds)
-
-> "We start with a legacy game. Copilot Chat understands it, the Game Agent instruments it, Canvas governs the plan, MCP connects the tools, and the Platform and Integration Agents turn it into a multi-repo event-driven system."
+| Feature | One-line proof |
+| --- | --- |
+| **Plan Mode** | Copilot reasons about the codebase and proposes steps before writing code |
+| **Canvas** | Plan is shown, edited, approved, and tracked in a visual workspace |
+| **Agent Mode** | Game Agent and Platform Agent execute scoped, role-specific tasks |
+| **Agent Merge** | Integration Agent combines outputs from both agents into one validation |
+| **MCP** | Every tool call (read, write, run) is visible, declared, and auditable |
+| **Multi-repo task** | One session spans both repos and validates cross-repo compatibility |
+| **Workflow Automation** | Safety checks run automatically on every push — no human needed |
