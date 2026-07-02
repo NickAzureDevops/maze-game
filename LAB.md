@@ -250,6 +250,7 @@ In the Game Agent session, type:
 
 Skill file in this repo:
 - `.github/prompts/event-schema-validation.prompt.md`
+- `.github/skills/event-schema-validation/SKILL.md`
 
 **What to point out:**
 - The agent doesn't re-read the codebase from scratch — it calls the skill

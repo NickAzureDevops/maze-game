@@ -51,6 +51,7 @@ Typical payloads emitted by this repo:
 This repo includes a reusable prompt skill:
 
 - `.github/prompts/event-schema-validation.prompt.md`
+- `.github/skills/event-schema-validation/SKILL.md`
 
 Use it to validate producer-side contract compliance before demos or merges.
 
