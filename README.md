@@ -7,9 +7,9 @@ A browser-based maze game with a modern dashboard shell, built with vanilla Java
 This repository is the **Game Agent** side of a broader **GitHub Copilot Apps** demo. It keeps Maze Game playable while acting as the event producer for the wider system.
 
 - **In this repo** — context-aware code reasoning, safe event instrumentation, and gameplay-preserving changes
-- **In the broader system** — backend services, multi-repo orchestration, full-stack generation, and end-to-end event flow with [NickAzureDevops/pac-man-services](https://github.com/NickAzureDevops/pac-man-services)
+- **In the broader system** — backend services, multi-repo orchestration, full-stack generation, and end-to-end event flow with [NickAzureDevops/maze-services](https://github.com/NickAzureDevops/pac-man-services)
 
-Together, this Maze Game repo and [NickAzureDevops/pac-man-services](https://github.com/NickAzureDevops/pac-man-services) demonstrate:
+Together, this Maze Game repo and [NickAzureDevops/maze-services](https://github.com/NickAzureDevops/pac-man-services) demonstrate:
 
 - **Context-aware reasoning** — Copilot understands existing code in both repos and makes targeted changes.
 - **Planning and approval workflow** — Plans can be generated, reviewed, and then executed across repos.
