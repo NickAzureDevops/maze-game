@@ -98,13 +98,18 @@ https://github.com/NickAzureDevops/maze-game-services
 
 1. Run **Game Agent** in `maze-game` (quiz producer).
 2. Run **Platform Agent** in `maze-game-services` (service side).
-3. Run **Integration Agent** and invoke the **Agent Merge skill**.
+3. Create a PR from agent output (use the PR action from the agent run).
+4. Open that PR in a PR-bound Copilot session (this is what enables **Agent merge**).
+5. Run **Integration Agent** and invoke the **Agent Merge skill**.
 
 Game Agent prompt:
 > "Instrument this quiz app repo (maze-game) to emit scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } and fire-and-forget error handling. Keep quiz UI behavior unchanged. The endpoint is implemented in maze-game-services (https://github.com/NickAzureDevops/maze-game-services)."
 
 Platform Agent prompt:
 > "Build the event platform for this quiz app in maze-game-services. It needs a POST /event endpoint, a GET /events endpoint, and a live dashboard. Accept only scoreUpdated and achievementCandidate events."
+
+PR creation prompt (run after agent changes are ready):
+> "Create a pull request for this branch titled 'Demo: quiz event instrumentation for Agent Merge' with a short summary of event contract compatibility and changed files."
 
 Say:
 > "Now I split work across scoped agents, then invoke Agent Merge to return one compatibility verdict."
@@ -115,11 +120,6 @@ Integration prompt:
 Close line:
 > "Agent Merge is a reusable skill: multiple scoped agent outputs, one system-level answer."
 
-What to show in Canvas (proof):
-- Game Agent output (producer-side findings)
-- Platform Agent output (service-side findings)
-- Integration Agent merged result with one **PASS/FAIL**
-- Mismatches list (or **none** when PASS)
 
 ---
 
