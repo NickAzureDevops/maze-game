@@ -1,269 +1,300 @@
 import './style.css'
 import { emitEvent } from './counter.js'
 
-// ─── DOM ─────────────────────────────────────────────────────────────────────
-const canvas  = document.getElementById('game')
-const ctx     = canvas.getContext('2d')
-const overlay = document.getElementById('overlay')
 const scoreEl = document.getElementById('score')
-const livesEl = document.getElementById('lives')
-const levelEl = document.getElementById('level')
+const streakEl = document.getElementById('streak')
+const progressEl = document.getElementById('progress')
+const progressMetaEl = document.getElementById('progress-meta')
+const questionTopicEl = document.getElementById('question-topic')
+const questionTextEl = document.getElementById('question-text')
+const answersEl = document.getElementById('answers')
+const feedbackPanelEl = document.getElementById('feedback-panel')
+const feedbackTitleEl = document.getElementById('feedback-title')
+const feedbackTextEl = document.getElementById('feedback-text')
+const feedbackExplanationEl = document.getElementById('feedback-explanation')
+const nextBtn = document.getElementById('next-btn')
+const restartBtn = document.getElementById('restart-btn')
 
-// ─── Config ──────────────────────────────────────────────────────────────────
-const T = 20, COLS = 28, ROWS = 28
-const PAC_SPEED = 10, GHOST_SPEED = 14, POWER_FRAMES = 300
-const ACHIEVEMENTS = [100, 500, 1000, 2500, 5000]
+const SCORE_PER_CORRECT = 100
+const STREAK_BONUS_STEP = 25
+const ACHIEVEMENT_MILESTONES = [300, 700, 1200, 1800, 2500]
 
-// 1=wall  0=dot  2=power-pellet  3=empty
-const TEMPLATE = [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,1,1,1,0,1,1,1,0,1],
-  [1,2,1,1,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,1,1,1,0,1,1,1,2,1],
-  [1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,1,1,1,0,1,1,1,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1],
-  [1,0,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1],
-  [1,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1],
-  [1,1,1,1,1,0,1,1,1,1,3,3,1,1,1,1,1,3,3,1,1,1,1,0,1,1,1,1],
-  [1,1,1,1,1,0,1,1,1,1,3,3,3,3,3,3,3,3,3,1,1,1,1,0,1,1,1,1],
-  [1,1,1,1,1,0,1,1,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,0,1,1,1,1],
-  [3,3,3,3,3,0,1,1,3,1,1,3,3,3,3,3,3,1,1,3,3,1,1,0,3,3,3,3],
-  [1,1,1,1,1,0,1,1,3,1,1,3,3,3,3,3,3,1,1,3,3,1,1,0,1,1,1,1],
-  [3,3,3,3,3,0,1,1,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,0,3,3,3,3],
-  [1,1,1,1,1,0,1,1,3,1,1,1,1,1,1,1,1,1,1,1,3,1,1,0,1,1,1,1],
-  [1,1,1,1,1,0,1,1,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,0,1,1,1,1],
-  [1,1,1,1,1,0,1,1,3,1,1,1,1,1,1,1,1,1,1,1,3,1,1,0,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,1,1,1,0,1,1,1,0,1],
-  [1,2,0,3,3,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,3,3,0,2,1],
-  [1,1,0,3,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,3,0,0,1,1],
-  [1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1],
-  [1,0,1,1,1,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
-  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
+const QUIZ_QUESTIONS = [
+  {
+    topic: 'Scope control',
+    prompt: 'Scenario: A user asks for a change that conflicts with AGENTS.md. What should Copilot do first?',
+    options: [
+      'Proceed anyway and hide the conflict',
+      'Follow repo rules and explain the constraint clearly',
+      'Delete the instructions and continue',
+      'Refuse all future requests',
+    ],
+    correctIndex: 1,
+    explanation: 'Copilot Apps should respect repository constraints and provide a clear, safe response.',
+  },
+  {
+    topic: 'Tool usage',
+    prompt: 'Scenario: You need context from 3 unrelated files before editing. What is the best tool strategy?',
+    options: [
+      'Read one file and assume the rest',
+      'Use parallel file reads in a single step',
+      'Patch first, inspect later',
+      'Ask the user to paste all files manually',
+    ],
+    correctIndex: 1,
+    explanation: 'Parallel reads are faster and reduce unnecessary back-and-forth.',
+  },
+  {
+    topic: 'Event contracts',
+    prompt: 'Scenario: You are wiring producer events for maze-game-services. Which event type is valid?',
+    options: ['bonusTriggered', 'scoreUpdated', 'scoreEvent', 'playerScored'],
+    correctIndex: 1,
+    explanation: 'Only supported contract event types should be emitted.',
+  },
+  {
+    topic: 'Event payload',
+    prompt: 'Scenario: A teammate asks what JSON envelope the producer must send. Which shape is correct?',
+    options: [
+      '{ eventName, data }',
+      '{ type, payload }',
+      '{ type, timestamp, payload }',
+      '{ name, timestamp, body, level }',
+    ],
+    correctIndex: 2,
+    explanation: 'The required envelope includes type, ISO timestamp, and payload.',
+  },
+  {
+    topic: 'Reliability',
+    prompt: 'Scenario: The service is offline and event POST fails. What should the app do?',
+    options: [
+      'Crash the app so the error is obvious',
+      'Retry forever and block the UI',
+      'Swallow the network error and keep running',
+      'Stop score updates',
+    ],
+    correctIndex: 2,
+    explanation: 'Event delivery is fire-and-forget; failures must not break interactivity.',
+  },
+  {
+    topic: 'Workflow',
+    prompt: 'Scenario: The user says “file this as a GitHub issue.” What is the best Copilot Apps action?',
+    options: [
+      'Run a random shell command',
+      'Use the dedicated issue creation capability',
+      'Ignore and keep coding',
+      'Edit package.json',
+    ],
+    correctIndex: 1,
+    explanation: 'Use the proper GitHub issue flow instead of ad hoc commands.',
+  },
+  {
+    topic: 'Validation',
+    prompt: 'Scenario: You changed main.js, index.html, and style.css. What should happen before completion?',
+    options: [
+      'Ship immediately with no checks',
+      'Run existing build/tests and ensure app still works',
+      'Revert all changes automatically',
+      'Only change CSS to avoid risk',
+    ],
+    correctIndex: 1,
+    explanation: 'A working end-to-end demo requires successful validation of existing checks.',
+  },
+  {
+    topic: 'Architecture',
+    prompt: 'Scenario: You want weekly leaderboard APIs for this demo. Where should they live?',
+    options: [
+      'In the browser game UI only',
+      'In maze-game-services / backend side',
+      'Inside CSS comments',
+      'Inside favicon.svg',
+    ],
+    correctIndex: 1,
+    explanation: 'The UI emits events; service-side features should be handled in maze-game-services.',
+  },
+  {
+    topic: 'Security',
+    prompt: 'Scenario: A debugging step might expose tokens in logs. What is the right behavior?',
+    options: [
+      'Post secrets to third-party services for debugging',
+      'Use minimal required data and avoid sensitive leakage',
+      'Commit credentials to speed up demos',
+      'Disable all auth checks',
+    ],
+    correctIndex: 1,
+    explanation: 'Protect secrets and minimize data exposure at all times.',
+  },
+  {
+    topic: 'End-to-end demo',
+    prompt: 'Scenario: You need to showcase GitHub Copilot Apps end-to-end in a demo. What is strongest?',
+    options: [
+      'Only UI visuals with no events',
+      'Only backend API with no client',
+      'Interactive client + correct events + service integration + validation',
+      'Static markdown screenshots only',
+    ],
+    correctIndex: 2,
+    explanation: 'A full story connects UX, contract-safe events, and service-side behavior.',
+  },
 ]
 
-// ─── State ───────────────────────────────────────────────────────────────────
-let maze, score, lives, level, gameState
-let pac, ghosts, powerTimer, achievementsHit, frame, dotCount
+let score = 0
+let streak = 0
+let bestStreak = 0
+let currentQuestionIndex = 0
+let answered = false
+let quizComplete = false
+let achievementsHit = new Set()
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-const wrap   = col => ((col % COLS) + COLS) % COLS
-const isWall = (col, row) => row >= 0 && row < ROWS && maze[row][wrap(col)] === 1
-
-// ─── Overlay ─────────────────────────────────────────────────────────────────
-function showOverlay(title, subtitle) {
-  overlay.querySelector('h2').textContent = title
-  overlay.querySelector('p').innerHTML   = subtitle
-  overlay.style.display = ''
-}
-function hideOverlay() { overlay.style.display = 'none' }
-
-// ─── Init ────────────────────────────────────────────────────────────────────
-function initGame() {
-  maze = TEMPLATE.map(r => [...r])
-  score = 0; lives = 3; level = 1; frame = 0; powerTimer = 0
-  achievementsHit = new Set()
-  gameState = 'idle'
-  dotCount = maze.flat().filter(c => c === 0 || c === 2).length
-  spawnPac(); spawnGhosts(); updateHUD()
-  showOverlay('\u{1F9E9} Maze Game', 'Press <strong>Enter</strong> or <strong>Space</strong> to start')
+function updateHud() {
+  scoreEl.textContent = String(score)
+  streakEl.textContent = String(streak)
+  const progressValue = quizComplete
+    ? `${QUIZ_QUESTIONS.length}/${QUIZ_QUESTIONS.length}`
+    : `${currentQuestionIndex + 1}/${QUIZ_QUESTIONS.length}`
+  progressEl.textContent = progressValue
+  progressMetaEl.textContent = `Question ${progressValue}`
 }
 
-function spawnPac() {
-  pac = { col: 14, row: 24, dx: 0, dy: 0, nextDx: 0, nextDy: 0, mouth: 0, mouthDir: 1 }
+function setFeedback(title, text, explanation, tone) {
+  feedbackPanelEl.dataset.tone = tone
+  feedbackTitleEl.textContent = title
+  feedbackTextEl.textContent = text
+  feedbackExplanationEl.textContent = explanation
 }
 
-function spawnGhosts() {
-  ghosts = [
-    { col: 13, row: 13, dx:  0, dy: -1, color: '#FF0000', frightened: false },
-    { col: 14, row: 13, dx:  0, dy:  1, color: '#FFB8FF', frightened: false },
-    { col: 12, row: 14, dx: -1, dy:  0, color: '#00FFFF', frightened: false },
-    { col: 15, row: 14, dx:  1, dy:  0, color: '#FFB852', frightened: false },
-  ]
+function emitScore(delta) {
+  emitEvent('scoreUpdated', {
+    score,
+    delta,
+    level: currentQuestionIndex + 1,
+  })
 }
 
-// ─── Input ───────────────────────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    if (gameState === 'idle')  { gameState = 'playing'; hideOverlay() }
-    else if (gameState === 'dead') { initGame(); gameState = 'playing'; hideOverlay() }
-    e.preventDefault(); return
-  }
-  if (gameState !== 'playing') return
-  switch (e.key) {
-    case 'ArrowLeft':  case 'a': pac.nextDx = -1; pac.nextDy =  0; break
-    case 'ArrowRight': case 'd': pac.nextDx =  1; pac.nextDy =  0; break
-    case 'ArrowUp':    case 'w': pac.nextDx =  0; pac.nextDy = -1; break
-    case 'ArrowDown':  case 's': pac.nextDx =  0; pac.nextDy =  1; break
-    default: return
-  }
-  e.preventDefault()
-})
+function emitAchievement(achievement) {
+  emitEvent('achievementCandidate', {
+    score,
+    achievement,
+    level: Math.min(currentQuestionIndex + 1, QUIZ_QUESTIONS.length),
+  })
+}
 
-// ─── Scoring ─────────────────────────────────────────────────────────────────
-function addScore(delta) {
-  score += delta; updateHUD()
-  emitEvent('scoreUpdated', { score, delta, level })
-  for (const m of ACHIEVEMENTS) {
-    if (score >= m && !achievementsHit.has(m)) {
-      achievementsHit.add(m)
-      emitEvent('achievementCandidate', { score, achievement: `Reached ${m} points!`, level })
+function checkMilestones() {
+  for (const milestone of ACHIEVEMENT_MILESTONES) {
+    if (score >= milestone && !achievementsHit.has(milestone)) {
+      achievementsHit.add(milestone)
+      emitAchievement(`Reached ${milestone} quiz points!`)
     }
   }
 }
 
-function updateHUD() {
-  scoreEl.textContent = score
-  livesEl.textContent = lives
-  levelEl.textContent = level
+function renderQuestion() {
+  const question = QUIZ_QUESTIONS[currentQuestionIndex]
+  questionTopicEl.textContent = `Topic · ${question.topic}`
+  questionTextEl.textContent = question.prompt
+  answersEl.innerHTML = ''
+
+  question.options.forEach((option, index) => {
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'answer'
+    btn.textContent = `${String.fromCharCode(65 + index)}. ${option}`
+    btn.addEventListener('click', () => selectAnswer(index))
+    answersEl.appendChild(btn)
+  })
+
+  setFeedback('Ready?', 'Choose the best answer to continue.', '', 'info')
+  nextBtn.disabled = true
+  nextBtn.textContent = currentQuestionIndex === QUIZ_QUESTIONS.length - 1 ? 'Finish quiz' : 'Next question'
+  updateHud()
 }
 
-// ─── Update ──────────────────────────────────────────────────────────────────
-function update() {
-  if (gameState !== 'playing') return
-  frame++
+function selectAnswer(selectedIndex) {
+  if (answered || quizComplete) return
 
-  // Animate mouth
-  pac.mouth += pac.mouthDir * 0.06
-  if (pac.mouth >= 0.25) pac.mouthDir = -1
-  if (pac.mouth <= 0)    pac.mouthDir =  1
+  answered = true
+  const question = QUIZ_QUESTIONS[currentQuestionIndex]
+  const isCorrect = selectedIndex === question.correctIndex
+  const answerButtons = [...answersEl.querySelectorAll('.answer')]
 
-  // Power timer
-  if (powerTimer > 0 && --powerTimer === 0) ghosts.forEach(g => { g.frightened = false })
+  answerButtons.forEach((button, index) => {
+    button.disabled = true
+    if (index === question.correctIndex) button.classList.add('answer--correct')
+    if (index === selectedIndex && !isCorrect) button.classList.add('answer--wrong')
+  })
 
-  // Move player
-  if (frame % PAC_SPEED === 0) {
-    const nc = wrap(pac.col + pac.nextDx), nr = pac.row + pac.nextDy
-    if (!isWall(nc, nr)) { pac.dx = pac.nextDx; pac.dy = pac.nextDy }
-
-    if (pac.dx !== 0 || pac.dy !== 0) {
-      const mc = wrap(pac.col + pac.dx), mr = pac.row + pac.dy
-      if (!isWall(mc, mr)) { pac.col = mc; pac.row = mr }
-
-      const cell = maze[pac.row]?.[pac.col]
-      if (cell === 0) {
-        maze[pac.row][pac.col] = 3; dotCount--; addScore(10)
-      } else if (cell === 2) {
-        maze[pac.row][pac.col] = 3; dotCount--; addScore(50)
-        powerTimer = POWER_FRAMES
-        ghosts.forEach(g => { g.frightened = true })
-      }
-
-      if (dotCount === 0) nextLevel()
-    }
-  }
-
-  // Move ghosts
-  if (frame % GHOST_SPEED === 0) ghosts.forEach(moveGhost)
-
-  // Collision
-  for (const g of ghosts) {
-    if (g.col === pac.col && g.row === pac.row) {
-      if (g.frightened) {
-        Object.assign(g, { col: 13, row: 13, frightened: false })
-        addScore(200)
-      } else {
-        onDied(); return
-      }
-    }
-  }
-}
-
-function moveGhost(g) {
-  const DIRS = [{ dx:1,dy:0},{ dx:-1,dy:0},{ dx:0,dy:1},{ dx:0,dy:-1}]
-  let opts = DIRS
-    .filter(d => !(d.dx === -g.dx && d.dy === -g.dy))
-    .filter(d => !isWall(wrap(g.col + d.dx), g.row + d.dy))
-  if (!opts.length) opts = DIRS.filter(d => !isWall(wrap(g.col + d.dx), g.row + d.dy))
-  if (!opts.length) return
-
-  const dist = d => Math.abs(wrap(g.col + d.dx) - pac.col) + Math.abs((g.row + d.dy) - pac.row)
-  const chosen = g.frightened
-    ? opts[Math.floor(Math.random() * opts.length)]
-    : opts.reduce((best, d) => dist(d) < dist(best) ? d : best)
-
-  g.col = wrap(g.col + chosen.dx); g.row += chosen.dy
-  g.dx = chosen.dx; g.dy = chosen.dy
-}
-
-function onDied() {
-  lives--; updateHUD()
-  emitEvent('scoreUpdated', { score, delta: 0, lives, level })
-  if (lives <= 0) {
-    gameState = 'dead'
-    showOverlay('\u{1F480} Game Over', `Final Score: ${score} &nbsp;|&nbsp; Press Enter to restart`)
+  if (isCorrect) {
+    streak += 1
+    bestStreak = Math.max(bestStreak, streak)
+    const delta = SCORE_PER_CORRECT + (streak - 1) * STREAK_BONUS_STEP
+    score += delta
+    emitScore(delta)
+    checkMilestones()
+    if (streak > 0 && streak % 3 === 0) emitAchievement(`${streak}-answer streak achieved!`)
+    setFeedback(
+      'Correct',
+      `+${delta} points earned.`,
+      question.explanation,
+      'success',
+    )
   } else {
-    spawnPac(); spawnGhosts(); powerTimer = 0
-  }
-}
-
-function nextLevel() {
-  level++; maze = TEMPLATE.map(r => [...r])
-  dotCount = maze.flat().filter(c => c === 0 || c === 2).length
-  spawnPac(); spawnGhosts(); powerTimer = 0; updateHUD()
-  emitEvent('achievementCandidate', { score, achievement: `Level ${level} reached!`, level })
-}
-
-// ─── Draw ────────────────────────────────────────────────────────────────────
-function draw() {
-  ctx.fillStyle = '#000'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const x = c * T, y = r * T
-      if (maze[r][c] === 1) {
-        ctx.fillStyle = '#1a1aff'; ctx.fillRect(x, y, T, T)
-        ctx.strokeStyle = '#0000aa'; ctx.lineWidth = 1
-        ctx.strokeRect(x + 0.5, y + 0.5, T - 1, T - 1)
-      } else if (maze[r][c] === 0) {
-        ctx.fillStyle = '#ffcc00'
-        ctx.beginPath(); ctx.arc(x + T/2, y + T/2, 2, 0, Math.PI * 2); ctx.fill()
-      } else if (maze[r][c] === 2) {
-        ctx.fillStyle = '#ffcc00'
-        ctx.beginPath(); ctx.arc(x + T/2, y + T/2, 5, 0, Math.PI * 2); ctx.fill()
-      }
-    }
+    streak = 0
+    setFeedback(
+      'Not quite',
+      `Correct answer: ${question.options[question.correctIndex]}`,
+      question.explanation,
+      'error',
+    )
   }
 
-  // Ghosts
-  for (const g of ghosts) {
-    const gx = g.col * T + T/2, gy = g.row * T + T/2, gr = T/2 - 1
-    ctx.fillStyle = g.frightened ? (frame % 20 < 10 ? '#2121de' : '#fff') : g.color
-    ctx.beginPath()
-    ctx.arc(gx, gy - 2, gr, Math.PI, 0)
-    ctx.lineTo(gx + gr, gy + gr - 2)
-    ctx.quadraticCurveTo(gx + gr * 0.67, gy + gr + 1, gx + gr * 0.33, gy + gr - 2)
-    ctx.quadraticCurveTo(gx,             gy + gr + 1, gx - gr * 0.33, gy + gr - 2)
-    ctx.quadraticCurveTo(gx - gr * 0.67, gy + gr + 1, gx - gr,        gy + gr - 2)
-    ctx.lineTo(gx - gr, gy - 2)
-    ctx.closePath(); ctx.fill()
-    if (!g.frightened) {
-      ctx.fillStyle = '#fff'
-      ctx.beginPath(); ctx.arc(gx - 3, gy - 3, 3, 0, Math.PI * 2); ctx.fill()
-      ctx.beginPath(); ctx.arc(gx + 3, gy - 3, 3, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle = '#00f'
-      ctx.beginPath(); ctx.arc(gx - 2, gy - 3, 1.5, 0, Math.PI * 2); ctx.fill()
-      ctx.beginPath(); ctx.arc(gx + 4, gy - 3, 1.5, 0, Math.PI * 2); ctx.fill()
-    }
-  }
-
-  // Player
-  const px = pac.col * T + T/2, py = pac.row * T + T/2
-  const rot = pac.dx === -1 ? Math.PI : pac.dy === -1 ? -Math.PI/2 : pac.dy === 1 ? Math.PI/2 : 0
-  ctx.fillStyle = '#FFD700'
-  ctx.beginPath()
-  ctx.moveTo(px, py)
-  ctx.arc(px, py, T/2 - 2, rot + pac.mouth, rot + Math.PI * 2 - pac.mouth)
-  ctx.closePath(); ctx.fill()
+  updateHud()
+  nextBtn.disabled = false
 }
 
-// ─── Loop ────────────────────────────────────────────────────────────────────
-function loop() { update(); draw(); requestAnimationFrame(loop) }
+function finishQuiz() {
+  quizComplete = true
+  questionTopicEl.textContent = 'Run complete'
+  questionTextEl.textContent = `Final score: ${score}. Best streak: ${bestStreak}.`
+  answersEl.innerHTML = ''
+  nextBtn.disabled = true
+  nextBtn.textContent = 'Completed'
+  restartBtn.classList.remove('is-hidden')
+  setFeedback(
+    'Quiz completed',
+    'You now have an end-to-end Copilot Apps learning run.',
+    'This mode demonstrates interactive UX + contract-safe events + repeatable scoring.',
+    'success',
+  )
+  emitAchievement(`Quiz completed with ${score} points!`)
+  updateHud()
+}
 
-initGame()
-loop()
+function goNext() {
+  if (!answered || quizComplete) return
+
+  if (currentQuestionIndex >= QUIZ_QUESTIONS.length - 1) {
+    finishQuiz()
+    return
+  }
+
+  currentQuestionIndex += 1
+  answered = false
+  emitAchievement(`Advanced to question ${currentQuestionIndex + 1}`)
+  renderQuestion()
+}
+
+function resetQuiz() {
+  score = 0
+  streak = 0
+  bestStreak = 0
+  currentQuestionIndex = 0
+  answered = false
+  quizComplete = false
+  achievementsHit = new Set()
+  restartBtn.classList.add('is-hidden')
+  renderQuestion()
+}
+
+nextBtn.addEventListener('click', goNext)
+restartBtn.addEventListener('click', resetQuiz)
+
+resetQuiz()

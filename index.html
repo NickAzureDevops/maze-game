@@ -4,50 +4,62 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🧩 Maze Game Dashboard</title>
+    <title>🤖 Copilot Apps Quiz</title>
   </head>
   <body>
     <div id="app">
       <header class="app-header">
         <div class="app-title-block">
-          <p class="app-kicker">Playable telemetry surface</p>
-          <h1>Maze Game dashboard</h1>
+          <p class="app-kicker">Interactive learning mode</p>
+          <h1>GitHub Copilot Apps Quiz</h1>
           <p class="app-subtitle">
-            A focused arcade shell for score, lives, and level tracking while you test the game loop.
+            Learn core Copilot Apps workflows through an end-to-end scenario quiz with score, streaks, and instant feedback.
           </p>
         </div>
         <div class="status-pills" aria-label="Interface status">
-          <span class="status-pill status-pill--primary">Live canvas</span>
-          <span class="status-pill">Keyboard ready</span>
+          <span class="status-pill status-pill--primary">Quiz live</span>
+          <span class="status-pill">No backend required</span>
         </div>
       </header>
 
-      <main class="dashboard-shell">
-        <section class="playfield-panel" aria-label="Maze Game playfield">
+      <main class="quiz-shell">
+        <section class="quiz-panel" aria-label="Quiz experience">
           <div class="panel-head">
             <div>
-              <p class="panel-label">Playfield</p>
-              <h2 class="panel-title">Arcade view</h2>
+              <p class="panel-label">Question flow</p>
+              <h2 class="panel-title">Scenario challenge</h2>
             </div>
-            <p class="panel-meta">560 x 560 canvas</p>
+            <p id="progress-meta" class="panel-meta">Question 1 of 10</p>
           </div>
 
-          <div id="game-container">
-            <canvas id="game" width="560" height="560"></canvas>
-            <div id="overlay">
-              <h2>🧩 Maze Game</h2>
-              <p>Press <strong>Enter</strong> or <strong>Space</strong> to start</p>
-            </div>
-          </div>
+          <article id="question-card" class="question-card">
+            <p id="question-topic" class="question-topic">Topic</p>
+            <h3 id="question-text" class="question-text">Question goes here</h3>
+            <div id="answers" class="answer-grid" role="list" aria-label="Answer choices"></div>
+          </article>
 
-          <p id="instructions">Arrow keys / WASD to move &nbsp;|&nbsp; Enter / Space to start</p>
+          <section id="feedback-panel" class="feedback-panel" aria-live="polite">
+            <h4 id="feedback-title" class="feedback-title">Ready?</h4>
+            <p id="feedback-text" class="feedback-text">Pick an answer to see instant feedback.</p>
+            <p id="feedback-explanation" class="feedback-explanation"></p>
+          </section>
+
+          <div class="action-row">
+            <button id="next-btn" class="quiz-button quiz-button--primary" type="button" disabled>
+              Next question
+            </button>
+            <button id="restart-btn" class="quiz-button is-hidden" type="button">
+              Restart quiz
+            </button>
+          </div>
         </section>
 
-        <aside class="sidebar-panel" aria-label="Game dashboard">
+        <aside class="sidebar-panel" aria-label="Quiz dashboard">
           <div class="sidebar-card">
-            <p class="panel-label">Run state</p>
+            <p class="panel-label">How scoring works</p>
             <p class="sidebar-copy">
-              Start the round, watch the telemetry update, and verify score or achievement events without losing sight of the board.
+              Correct answers add points. Keep a streak to earn a bonus. Score milestones trigger compatible events for
+              <code>maze-game-services</code>.
             </p>
           </div>
 
@@ -57,20 +69,21 @@
               <span id="score" class="stat-value">0</span>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Lives</span>
-              <span id="lives" class="stat-value">3</span>
+              <span class="stat-label">Streak</span>
+              <span id="streak" class="stat-value">0</span>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Level</span>
-              <span id="level" class="stat-value">1</span>
+              <span class="stat-label">Progress</span>
+              <span id="progress" class="stat-value">1/10</span>
             </div>
           </div>
 
           <div class="sidebar-card sidebar-card--compact">
-            <p class="panel-label">Controls</p>
+            <p class="panel-label">Focus areas</p>
             <ul class="control-list">
-              <li><span>Move</span><strong>Arrow keys / WASD</strong></li>
-              <li><span>Start</span><strong>Enter / Space</strong></li>
+              <li><span>Event contracts</span><strong>Supported types only</strong></li>
+              <li><span>Tool usage</span><strong>Safe and efficient flow</strong></li>
+              <li><span>Session workflow</span><strong>Scope + approvals</strong></li>
             </ul>
           </div>
         </aside>

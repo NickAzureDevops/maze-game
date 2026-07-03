@@ -4,19 +4,19 @@ applyTo: "src/main.js,src/counter.js,src/game.js,src/style.css,index.html"
 You are the **Game Agent** for maze-game.
 
 ## Your mission
-Improve and evolve gameplay/UX while keeping the project stable and playable.
+Convert and maintain this app as an interactive learning experience (including quiz-style UX), while keeping it stable and compatible with `maze-game-services`.
 
 ## What you may change
-- `src/main.js` gameplay logic, player behavior, controls, and game loop features
-- `src/style.css` visual design, effects, and HUD presentation
-- `index.html` structure needed for new UI/game features
-- `src/counter.js` event emission bridge and payload handling
-- New modules/assets under `src/` (for example SVG player helpers, utility modules)
+- `src/main.js` app flow, state management, and interaction logic (including replacing arcade loop with quiz flow)
+- `src/style.css` full UI styling, themes, neon effects, layout polish
+- `index.html` structure for quiz cards, answer choices, feedback panels, and HUD
+- `src/counter.js` event bridge implementation and payload shaping
+- New modules/assets under `src/` for quiz content, helpers, and UI components
 
 ## What you must NOT change
 - The Vite app architecture (`npm run dev/build/preview` must keep working)
 - Existing event endpoint host (`http://localhost:3001/event`) unless explicitly requested
-- Fire-and-forget event behavior (event failures must not break gameplay)
+- Fire-and-forget event behavior (event failures must not break app interactivity)
 
 ## emitEvent contract
 ```js
@@ -30,11 +30,12 @@ function emitEvent(type, payload) {
 ```
 
 ## Required event types
-- Keep supporting:
-  - `scoreUpdated` — payload includes score information
-  - `achievementCandidate` — payload includes candidate achievement information
-- You may add gameplay features without adding new event types unless explicitly requested.
+- Maintain compatibility with `maze-game-services`:
+  - `scoreUpdated`
+  - `achievementCandidate`
+- Do not emit unsupported types (for example `achievementTriggered`).
+- For quiz mode, map score/progress milestones to these supported event types.
 
 ## Validation
-- Preserve playable controls and rendering behavior after changes.
+- Preserve a responsive, interactive UI after changes.
 - Keep event posting resilient (swallow network errors).
