@@ -3,11 +3,6 @@
 > **Total time: 20–30 minutes**
 > **Goal:** Show how GitHub Copilot Apps evolves a quiz app into a multi-repo, event-driven system using Canvas, Plan Mode, Agent Mode, MCP, Multi-repo tasks, and Agent Skills.
 
-Reference video:
-- https://www.youtube.com/watch?v=fpP20wKaKRc&t=1s
-
-## 🚀 Demo opener — 3 power pillars
-
 - **Canvas (live plan, approval gate, artifact trace)**  
   Show plan view, approval control, real-time status, and changed-file trace.
 - **Different modes (Interactive vs Plan, same prompt different control)**  
@@ -23,7 +18,7 @@ Reference video:
 4. **Agent Merge moment** → Integration Agent returns one end-to-end compatibility verdict.
 5. **Repeatability moment** → run validation skill to prove reusable capability.
 
-## 🏗️ System Overview
+## Overview
 
 ```javascript
 ┌──────────────────────────────┐
@@ -52,7 +47,7 @@ https://github.com/NickAzureDevops/maze-game-services
 
 ---
 
-## 🟦 1. Canvas (3 min)
+## Canvas (3 min)
 
 > **Opening thesis — say this out loud:**
 > "Traditional UIs are for *using* software. Canvas is for *shaping* software while it runs. It's Human-to-AI-to-System — and it actually executes."
@@ -65,14 +60,14 @@ https://github.com/NickAzureDevops/maze-game-services
 4. Open the **artifact log** and show changed files.
 5. Edit one step briefly to prove human control.
 
-> **Demo note:** keep the quiz panel with a **red neon border glow** so the live surface stands out on stage.
+> **Demo note:** keep the quiz panel with a **blue neon border glow** so the live surface stands out on stage.
 
 **Key message:**  
 > "This is live and executable. The AI proposes, the human approves, and Canvas tracks execution."
 
 ---
 
-## 🟣 2. Control Modes (30 sec mention)
+## Control Modes
 
 > **What you're showing:** Same prompt, different control policy.
 
@@ -90,13 +85,10 @@ https://github.com/NickAzureDevops/maze-game-services
 
 ---
 
-## 🤖 3. Agent Mode / Agent Merge (5 min)
+## Agent Mode / Agent Merge
 
 Game Agent prompt:
 > "Instrument maze-game (quiz app) to emit only scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } with fire-and-forget error handling. Keep quiz UI behavior unchanged. Endpoint is implemented in maze-game-services."
-
-Blue canvas + PR prompt:
-> "Make small changes in the canvas by making it blue and raise a PR."
 
 Platform Agent prompt:
 > "Build the event platform for this quiz app in maze-game-services. It needs a POST /event endpoint, a GET /events endpoint, and a live dashboard. Accept only scoreUpdated and achievementCandidate events."
@@ -104,12 +96,11 @@ Platform Agent prompt:
 Integration prompt:
 > "Use Agent Merge to combine Game Agent and Platform Agent outputs. Return one PASS/FAIL compatibility result with mismatches grouped by repo."
 
-Say:
-> "Scoped agents run separately; Agent Merge gives one system-level answer."
+"Make small changes in the canvas by making it blue and raise a PR."
 
 ---
 
-## 🔗 4. MCP (4 min)
+## MCP
 
 > **What you're showing:** MCP (Model Context Protocol) is the tool bridge that lets agents interact with repos, APIs, and runtime state safely.
 
