@@ -92,33 +92,17 @@ https://github.com/NickAzureDevops/maze-game-services
 
 ## 🤖 3. Agent Mode / Agent Merge (5 min)
 
-> **This section shows Agent Merge used as a skill invocation, not a manual summary.**
-
-### Live script (60 sec)
-
-1. Run **Game Agent** in `maze-game` (quiz producer).
-2. Run **Platform Agent** in `maze-game-services` (service side).
-3. Create a PR from agent output (use the PR action from the agent run).
-4. Open that PR in a PR-bound Copilot session (this is what enables **Agent merge**).
-5. Run **Integration Agent** and invoke the **Agent Merge skill**.
-
 Game Agent prompt:
-> "Instrument this quiz app repo (maze-game) to emit scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } and fire-and-forget error handling. Keep quiz UI behavior unchanged. The endpoint is implemented in maze-game-services (https://github.com/NickAzureDevops/maze-game-services)."
+> "Instrument maze-game (quiz app) to emit only scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } with fire-and-forget error handling. Keep quiz UI behavior unchanged. Endpoint is implemented in maze-game-services."
 
 Platform Agent prompt:
 > "Build the event platform for this quiz app in maze-game-services. It needs a POST /event endpoint, a GET /events endpoint, and a live dashboard. Accept only scoreUpdated and achievementCandidate events."
 
-PR creation prompt (run after agent changes are ready):
-> "Create a pull request for this branch titled 'Demo: quiz event instrumentation for Agent Merge' with a short summary of event contract compatibility and changed files."
-
-Say:
-> "Now I split work across scoped agents, then invoke Agent Merge to return one compatibility verdict."
-
 Integration prompt:
 > "Use Agent Merge to combine Game Agent and Platform Agent outputs. Return one PASS/FAIL compatibility result with mismatches grouped by repo."
 
-Close line:
-> "Agent Merge is a reusable skill: multiple scoped agent outputs, one system-level answer."
+Say:
+> "Scoped agents run separately; Agent Merge gives one system-level answer."
 
 
 ---
