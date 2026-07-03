@@ -92,34 +92,20 @@ https://github.com/NickAzureDevops/maze-game-services
 
 ## 🤖 3. Agent Mode / Agent Merge (5 min)
 
-> **This section shows Agent Merge used as a skill invocation, not a manual summary.**
-
-### Live script (60 sec)
-
-1. Run **Game Agent** in `maze-game` (quiz producer).
-2. Run **Platform Agent** in `maze-game-services` (service side).
-3. Run **Integration Agent** and invoke the **Agent Merge skill**.
-
 Game Agent prompt:
-> "Instrument this quiz app repo (maze-game) to emit scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } and fire-and-forget error handling. Keep quiz UI behavior unchanged. The endpoint is implemented in maze-game-services (https://github.com/NickAzureDevops/maze-game-services)."
+> "Instrument maze-game (quiz app) to emit only scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } with fire-and-forget error handling. Keep quiz UI behavior unchanged. Endpoint is implemented in maze-game-services."
+
+Blue canvas + PR prompt:
+> "Make small changes in the canvas by making it blue and raise a PR."
 
 Platform Agent prompt:
 > "Build the event platform for this quiz app in maze-game-services. It needs a POST /event endpoint, a GET /events endpoint, and a live dashboard. Accept only scoreUpdated and achievementCandidate events."
 
-Say:
-> "Now I split work across scoped agents, then invoke Agent Merge to return one compatibility verdict."
-
 Integration prompt:
 > "Use Agent Merge to combine Game Agent and Platform Agent outputs. Return one PASS/FAIL compatibility result with mismatches grouped by repo."
 
-Close line:
-> "Agent Merge is a reusable skill: multiple scoped agent outputs, one system-level answer."
-
-What to show in Canvas (proof):
-- Game Agent output (producer-side findings)
-- Platform Agent output (service-side findings)
-- Integration Agent merged result with one **PASS/FAIL**
-- Mismatches list (or **none** when PASS)
+Say:
+> "Scoped agents run separately; Agent Merge gives one system-level answer."
 
 ---
 
