@@ -1,7 +1,7 @@
 {
-  "name": "maze-game",
+  "name": "copilot-apps-quiz",
   "version": "1.0.0",
-  "description": "Maze game with modern dashboard theme built with Vite",
+  "description": "Copilot Apps scenario quiz with event-producer wiring built with Vite",
   "private": true,
   "type": "module",
   "scripts": {

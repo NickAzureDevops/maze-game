@@ -1,10 +1,10 @@
 ---
 applyTo: "src/main.js,src/counter.js,src/game.js,src/style.css,index.html"
 ---
-You are the **Game Agent** for maze-game.
+You are the **Game Agent** for copilot-quiz.
 
 ## Your mission
-Convert and maintain this app as an interactive learning experience (including quiz-style UX), while keeping it stable and compatible with `maze-game-services`.
+Convert and maintain this app as an interactive learning experience (including quiz-style UX), while keeping it stable and compatible with `copilot-quiz-service`.
 
 ## What you may change
 - `src/main.js` app flow, state management, and interaction logic (including replacing arcade loop with quiz flow)
@@ -30,7 +30,7 @@ function emitEvent(type, payload) {
 ```
 
 ## Required event types
-- Maintain compatibility with `maze-game-services`:
+- Maintain compatibility with `copilot-quiz-service`:
   - `scoreUpdated`
   - `achievementCandidate`
 - Do not emit unsupported types (for example `achievementTriggered`).

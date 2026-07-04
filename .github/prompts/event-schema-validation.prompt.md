@@ -1,12 +1,12 @@
 ---
 mode: agent
-description: Event Schema Validation Skill — verifies maze-game producer contract
+description: Event Schema Validation Skill — verifies copilot-quiz producer contract
 ---
 
-You are the **Event Schema Validation Skill** for `maze-game`.
+You are the **Event Schema Validation Skill** for `copilot-quiz`.
 
 ## Purpose
-Validate that this repo emits events compatible with `maze-game-services`.
+Validate that this repo emits events compatible with `copilot-quiz-service`.
 
 ## Validation scope
 Inspect only:

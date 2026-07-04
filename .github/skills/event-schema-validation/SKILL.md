@@ -1,17 +1,17 @@
 ---
 name: event-schema-validation
-description: Validate maze-game producer events against the maze-game-services contract. Use when checking emitEvent usage, allowed event types, endpoint correctness, and fire-and-forget behavior.
+description: Validate copilot-quiz producer events against the copilot-quiz-service contract. Use when checking emitEvent usage, allowed event types, endpoint correctness, and fire-and-forget behavior.
 ---
 
 # Event Schema Validation
 
-Validate that `maze-game` emits only supported events to the consumer service contract.
+Validate that `copilot-quiz` emits only supported events to the consumer service contract.
 
 ## When to use
 
 Use this skill when:
 - reviewing changes in `src/main.js` or `src/counter.js`
-- preparing a demo run between `maze-game` and `maze-game-services`
+- preparing a demo run between `copilot-quiz` and `copilot-quiz-service`
 - verifying event contract compatibility after instrumentation changes
 
 ## Contract

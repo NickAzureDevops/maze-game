@@ -46,7 +46,7 @@ const QUIZ_QUESTIONS = [
   },
   {
     topic: 'Event contracts',
-    prompt: 'Scenario: You are wiring producer events for maze-game-services. Which event type is valid?',
+    prompt: 'Scenario: You are wiring producer events for the quiz event service. Which event type is valid?',
     options: ['bonusTriggered', 'scoreUpdated', 'scoreEvent', 'playerScored'],
     correctIndex: 1,
     explanation: 'Only supported contract event types should be emitted.',
@@ -104,12 +104,12 @@ const QUIZ_QUESTIONS = [
     prompt: 'Scenario: You want weekly leaderboard APIs for this demo. Where should they live?',
     options: [
       'In the browser game UI only',
-      'In maze-game-services / backend side',
+      'In the event service / backend side',
       'Inside CSS comments',
       'Inside favicon.svg',
     ],
     correctIndex: 1,
-    explanation: 'The UI emits events; service-side features should be handled in maze-game-services.',
+    explanation: 'The UI emits events; service-side features should be handled in the backend event service.',
   },
   {
     topic: 'Security',

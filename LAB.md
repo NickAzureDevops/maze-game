@@ -1,4 +1,4 @@
-# 🧩 GitHub Copilot Apps — Demo Lab
+# GitHub Copilot Apps — Demo Lab
 
 > **Total time: 20–30 minutes**
 > **Goal:** Show how GitHub Copilot Apps evolves a quiz app into a multi-repo, event-driven system using Canvas, Plan Mode, Agent Mode, MCP, Multi-repo tasks, and Agent Skills.
@@ -10,7 +10,7 @@
 - **Cross-repo execution + Agent Merge (one outcome from multiple scoped agents)**  
   Show producer + service coordination with one integrated compatibility result.
 
-## 🎬 Live flow (runtime-first)
+## Live flow (runtime-first)
 
 1. **Canvas runtime moment** → show live plan + approval + artifact trace.
 2. **Control modes moment** → same prompt in Interactive vs Plan (different control policy).
@@ -28,7 +28,7 @@
               │
    ┌──────────┼──────────────┐
    ▼          ▼              ▼
-🎮 maze-game   🌐 maze-game-services   🔗 MCP Layer
+🎮 Copilot Quiz   🌐 copilot-quiz-service   🔗 MCP Layer
 (event producer) (event consumer)    (tool bridge)
    │                   │
    └──── HTTP POST ────┘
@@ -39,11 +39,11 @@
 
 | Repo | Role |
 | --- | --- |
-| **maze-game** (this repo) | Legacy frontend — Game Agent instruments it |
-| **maze-game-services** | AI-built backend — Platform Agent creates it |
+| **Copilot Quiz** (this repo) | Legacy frontend — Game Agent instruments it |
+| **copilot-quiz-service** | AI-built backend — Platform Agent creates it |
 
 **Service repo (hosts `POST /event`):**  
-https://github.com/NickAzureDevops/maze-game-services
+https://github.com/NickAzureDevops/copilot-quiz-service
 
 ---
 
@@ -88,13 +88,12 @@ https://github.com/NickAzureDevops/maze-game-services
 ## Agent Mode / Agent Merge
 
 Game Agent prompt:
-> "Instrument maze-game (quiz app) to emit only scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } with fire-and-forget error handling. Keep quiz UI behavior unchanged. Endpoint is implemented in maze-game-services."
+> "Instrument Copilot Quiz (quiz app) to emit only scoreUpdated and achievementCandidate events to http://localhost:3001/event using { type, timestamp, payload } with fire-and-forget error handling. Keep quiz UI behavior unchanged. Endpoint is implemented in copilot-quiz-service."
 
 Platform Agent prompt:
-> "Build the event platform for this quiz app in maze-game-services. It needs a POST /event endpoint, a GET /events endpoint, and a live dashboard. Accept only scoreUpdated and achievementCandidate events."
+> "Build the event platform for this quiz app in copilot-quiz-service. It needs a POST /event endpoint, a GET /events endpoint, and a live dashboard. Accept only scoreUpdated and achievementCandidate events."
 
-Integration prompt:
-> "Use Agent Merge to combine Game Agent and Platform Agent outputs. Return one PASS/FAIL compatibility result with mismatches grouped by repo."
+Agent Merge 
 
 "Make small changes in the canvas by making it blue and raise a PR."
 
@@ -135,12 +134,12 @@ Then explain what MCP is:
 
 Open a new session with **both repos** available. Type:
 
-> "The quiz app (`maze-game`) emits events and `maze-game-services` receives them. Show me the full event flow from quiz to dashboard and confirm the schema matches end to end."
+> "The Copilot Quiz app emits events and `copilot-quiz-service` receives them. Show me the full event flow from quiz to dashboard and confirm the schema matches end to end."
 
 Watch Copilot:
 
-1. Read `src/counter.js` in maze-game — finds the POST shape
-2. Read `src/server.js` in maze-game-services — finds the accepted event types
+1. Read `src/counter.js` in Copilot Quiz — finds the POST shape
+2. Read `src/server.js` in copilot-quiz-service — finds the accepted event types
 3. Compare schemas and confirm they match
 4. Report which events flow and what the dashboard will show
 
@@ -149,10 +148,10 @@ Watch Copilot:
 ```bash
 
 # Terminal 1 — game
-cd maze-game && npm run dev
+cd <copilot-quiz-repo> && npm run dev
 
 # Terminal 2 — platform
-cd maze-game-services && node src/server.js
+cd copilot-quiz-service && node src/server.js
 ```
 
 Play the quiz. Open `http://localhost:3001`. Show events appearing in the dashboard as score updates happen.
@@ -195,7 +194,7 @@ Skill file in this repo:
 
 Switch to the Integration Agent session and type:
 
-> "Run the event schema validation skill against both maze-game and maze-game-services and confirm the contracts match end to end."
+> "Run the event schema validation skill against both Copilot Quiz and copilot-quiz-service and confirm the contracts match end to end."
 
 **What to point out:**
 - The same skill runs in two different agents against two different repos

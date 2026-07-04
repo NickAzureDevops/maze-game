@@ -1,4 +1,4 @@
-// Event bridge — forwards game events to maze-game-services
+// Event bridge — forwards Copilot Quiz events to copilot-quiz-service
 export function emitEvent(type, payload) {
   fetch('http://localhost:3001/event', {
     method: 'POST',

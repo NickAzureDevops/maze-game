@@ -1,41 +1,64 @@
-# Copilot instructions for pac-man-game
+# Copilot Instructions — copilot-quiz
 
-This repository is the **legacy Pac-Man game** being AI-instrumented as part of the Copilot Apps demo.
+## Build & run
 
-## Role in demo
-This is the **event producer**. It runs a browser-based Pac-Man game and emits events to `pac-man-services` when meaningful things happen (score changes, achievements).
-
-## Hard constraints
-- Do NOT refactor gameplay logic
-- Do NOT add new game features
-- Do NOT change the canvas rendering or controls
-- Only add minimal event emission hooks
-- Keep `emitEvent()` fire-and-forget (errors must be silently swallowed)
-
-## Event emission rules
-All events POST to `http://localhost:3001/event` with shape:
-```json
-{
-  "type": "scoreUpdated" | "achievementCandidate",
-  "timestamp": "<ISO-8601>",
-  "payload": {}
-}
+```bash
+npm ci                # install dependencies
+npm run dev           # Vite dev server → http://localhost:5173
+npm run build         # production build to dist/
+npm run preview       # preview production build
 ```
 
-### scoreUpdated
-Emit whenever the player score increases:
-```json
-{ "score": 150 }
+No test suite or linter is configured.
+
+## Architecture
+
+Vite + vanilla JS single-page quiz app. This is the **event producer** half of a two-repo system; it emits fire-and-forget HTTP events to [copilot-quiz-service](https://github.com/NickAzureDevops/copilot-quiz-service) (the consumer/dashboard).
+
+```
+index.html          → quiz shell, HUD, answer grid
+src/main.js         → quiz flow, scoring, UI state, calls emitEvent()
+src/counter.js      → emitEvent() — HTTP bridge to copilot-quiz-service
+src/style.css       → all styling
 ```
 
-### achievementCandidate
-Emit when score crosses milestone thresholds (e.g. 10, 50, 100, 200):
+Scoring: correct answers earn `SCORE_PER_CORRECT` (100) plus a streak bonus (`STREAK_BONUS_STEP` × streak). Achievement milestones are defined in `ACHIEVEMENT_MILESTONES`.
+
+## Event emission contract
+
+`emitEvent(type, payload)` in `src/counter.js` POSTs to `http://localhost:3001/event`. It must stay **fire-and-forget** — errors are silently swallowed via `.catch(() => {})`.
+
+Envelope shape:
 ```json
-{ "score": 100, "achievement": "Reached 100" }
+{ "type": "<event-type>", "timestamp": "<ISO-8601>", "payload": { … } }
 ```
 
-## Integration context
-Consumer repo: https://github.com/NickAzureDevops/pac-man-services
+### Allowed event types (only these two)
 
-## Agent role
-The **Game Agent** owns this repo. Its only job is adding/fixing event emission — nothing else.
+| Type | When | Payload |
+|------|------|---------|
+| `scoreUpdated` | Every score change | `{ "score", "delta", "level" }` |
+| `achievementCandidate` | Milestone hit, streak multiple, level advance, quiz complete | `{ "score", "achievement", "level" }` |
+
+**Never emit `achievementTriggered`** — it is rejected by copilot-quiz-service.
+
+## Constraints
+
+- Do not change the Vite tooling contract (`npm run dev/build/preview`).
+- Do not change the event endpoint (`http://localhost:3001/event`) unless explicitly asked.
+- Event failures must never block quiz interactivity.
+- This repo is frontend-only — no backend routes.
+
+## Integration testing
+
+1. Start the service: `cd ../copilot-quiz-service && node src/server.js`
+2. Start the quiz: `npm run dev`
+3. Answer questions to earn points.
+4. Open `http://localhost:3001` — events should appear within 2 seconds.
+5. Check browser console for CORS errors (there should be none).
+
+## Repo skills & prompts
+
+- `.github/skills/event-schema-validation/` — validates emitEvent calls against the copilot-quiz-service contract.
+- `.github/prompts/event-schema-validation.prompt.md` — prompt to invoke that skill.
+- `.github/prompts/game-agent.prompt.md` — Game Agent prompt.
