@@ -34,7 +34,7 @@ jobs:
       - name: Summarize audit results and enforce policy
         run: |
           node - <<'NODE'
-          import fs from 'node:fs'
+          const fs = require('node:fs')
 
           const raw = fs.readFileSync('audit.json', 'utf8')
           const report = JSON.parse(raw)
