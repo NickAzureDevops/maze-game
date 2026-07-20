@@ -139,6 +139,7 @@ const QUIZ_QUESTIONS = [
 
 let score = 0
 let streak = 0
+let wrongStreak = 0
 let bestStreak = 0
 let currentQuestionIndex = 0
 let answered = false
@@ -223,6 +224,7 @@ function selectAnswer(selectedIndex) {
   })
 
   if (isCorrect) {
+    wrongStreak = 0
     streak += 1
     bestStreak = Math.max(bestStreak, streak)
     const delta = SCORE_PER_CORRECT + (streak - 1) * STREAK_BONUS_STEP
@@ -230,6 +232,7 @@ function selectAnswer(selectedIndex) {
     emitScore(delta)
     checkMilestones()
     if (streak > 0 && streak % 3 === 0) emitAchievement(`${streak}-answer streak achieved!`)
+    pulseScore()
     setFeedback(
       'Correct',
       `+${delta} points earned.`,
@@ -238,6 +241,12 @@ function selectAnswer(selectedIndex) {
     )
   } else {
     streak = 0
+    wrongStreak += 1
+    if (wrongStreak >= 3) {
+      shakeQuiz()
+      emitAchievement('Chaos streak unlocked!')
+      wrongStreak = 0
+    }
     setFeedback(
       'Not quite',
       `Correct answer: ${question.options[question.correctIndex]}`,
@@ -265,6 +274,7 @@ function finishQuiz() {
     'success',
   )
   emitAchievement(`Quiz completed with ${score} points!`)
+  spawnConfetti()
   updateHud()
 }
 
@@ -285,6 +295,7 @@ function goNext() {
 function resetQuiz() {
   score = 0
   streak = 0
+  wrongStreak = 0
   bestStreak = 0
   currentQuestionIndex = 0
   answered = false
@@ -292,6 +303,59 @@ function resetQuiz() {
   achievementsHit = new Set()
   restartBtn.classList.add('is-hidden')
   renderQuestion()
+}
+
+function pulseScore() {
+  const statCard = scoreEl.closest('.stat-card')
+  statCard.classList.add('stat-card--pulse')
+  setTimeout(() => statCard.classList.remove('stat-card--pulse'), 600)
+}
+
+function shakeQuiz() {
+  const panel = document.querySelector('.quiz-panel')
+  panel.classList.add('quiz-panel--shake')
+  setTimeout(() => panel.classList.remove('quiz-panel--shake'), 500)
+}
+
+function spawnConfetti() {
+  const canvas = document.createElement('canvas')
+  canvas.className = 'confetti-canvas'
+  document.body.appendChild(canvas)
+  const ctx = canvas.getContext('2d')
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+
+  const particles = Array.from({ length: 80 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height * -1,
+    r: Math.random() * 6 + 3,
+    dx: (Math.random() - 0.5) * 4,
+    dy: Math.random() * 4 + 2,
+    color: ['#facc15', '#22c55e', '#3b82f6', '#ef4444', '#a855f7'][Math.floor(Math.random() * 5)],
+    rotation: Math.random() * 360,
+    dr: (Math.random() - 0.5) * 8,
+  }))
+
+  let frame = 0
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    particles.forEach((particle) => {
+      ctx.save()
+      ctx.translate(particle.x, particle.y)
+      ctx.rotate((particle.rotation * Math.PI) / 180)
+      ctx.fillStyle = particle.color
+      ctx.fillRect(-particle.r, -particle.r / 2, particle.r * 2, particle.r)
+      ctx.restore()
+      particle.x += particle.dx
+      particle.y += particle.dy
+      particle.rotation += particle.dr
+      particle.dy += 0.1
+    })
+    frame += 1
+    if (frame < 120) requestAnimationFrame(draw)
+    else canvas.remove()
+  }
+  draw()
 }
 
 nextBtn.addEventListener('click', goNext)

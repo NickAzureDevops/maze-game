@@ -57,3 +57,16 @@ cd copilot-quiz-service && node src/server.js
 - [ ] Events at `localhost:3001` within 2s
 - [ ] No CORS errors
 - [ ] No quiz disruption from event failures
+
+---
+
+## Bonus: Visual Delight
+
+**Quiz UI**
+- Glow animation on score update
+- Confetti burst on quiz completion
+- Shake animation after 3 wrong answers
+
+**Dashboard signal**
+- After 3 wrong answers, the quiz emits an `achievementCandidate` with `"Chaos streak unlocked!"`.
+- This stays within the valid producer contract while giving the dashboard a gold-highlight moment.
